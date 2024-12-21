@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Airline Reservation System</title>
+        <link rel="icon" type="static/x-icon" href="/static/favicon.png">
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+        {% if not employee %}
+        <meta http-equiv="refresh" content="10; URL='{{ url_for('index') }}'" />
+        {% endif %}
+        <style>
+            tr:hover { cursor: pointer; background-color: #f1f1f1; }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Welcome to Airline Reservation System</h1>
+            <h2>Search Employee Info</h2>
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('search_flights') }}">Search Flights</a>
+            <a href="{{ url_for('flight_information') }}">Flight Information</a>
+            <a href="{{ url_for('account') }}">Account</a>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('logout') }}">Sign Out</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            {% endif %}
+        </nav>
+        </header>
+        <main>
+            {% if employee %}
+                <h2><strong>Employees Tools</strong></h2>
+                <a href="{{ url_for('account') }}">My Reservations</a>
+                <a class="account_here">Search Employee</a>
+                <a href="{{ url_for('create_flight') }}">Create New Flights</a>
+                <a href="{{ url_for('mod_flight') }}">Modify Existing Flights</a>
+                <br><br><hr>
+                <h2>Hey {{ name }}! What do you want to do?</h2>
+                <form id="Search_employee_ID" action="{{ url_for('search_employee') }}" method="POST">
+                    <label for="employee_id">Employee ID:</label>
+                    <input type="text" id="employee_id" name="employee_id" required>
+
+                    <button type="submit">Check Stats</button>
+                </form>
+                {% if user %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User ID</th>
+                                <th>First Name</th>
+                                <th>Last name</th>
+                                <th>Email</th>
+                                <th>Sales made</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ user.user_id }}</td>
+                                <td>{{ user.first_name }}</td>
+                                <td>{{ user.last_name }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.sales }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p><strong>No Employee Found</strong></p>
+                {% endif %}
+            {% else %}
+                <h2>You're not supposed to be here, lets take you home!</h2>
+            {% endif %}
+        </main>
+    </body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment</title>
+  <link rel="icon" type="static/x-icon" href="/static/favicon.png">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+  <header>
+    <h1>Welcome to Airline Reservation System</h1>
+    <h1>Payment</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('search_flights') }}">Search Flights</a>
+            <a href="{{ url_for('flight_information') }}">Flight Information</a>
+            <a href="{{ url_for('account') }}">Account</a>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('logout') }}">Sign Out</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            {% endif%}
+        </nav>
+  </header>
+
+  <main>
+    {% if flight %}
+      <h2>Flight ID: {{ flight["id"] }}</h2>
+      <p><strong>Origin:</strong> {{ flight["origin"] }}</p>
+      <p><strong>Destination:</strong> {{ flight["destination"] }}</p>
+      <p><strong>Date:</strong> {{ flight["date"] }}</p>
+      <p><strong>Seats Available:</strong> {{ flight["seats_available"] }}</p>
+      <p><strong>Flight Status:</strong> {{ flight['status'] }}</p>
+      <p><strong>Price:</strong> ${{ flight['ticket_price'] }}</p><!-- Dynamic price -->
+
+      <form id="payment-form">
+          {% if current_user.is_authenticated %}
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" value="{{ first_name }}" required>
+
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" value="{{ last_name }}" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="{{ email }}" required>
+          {% else %}
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" required>
+
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+          {% endif %}
+        <input type="hidden" id="flight-id" name="flight_id" value="{{ flight['flight_id'] }}">
+        <input type="hidden" id="price" name="price" value="{{ flight['ticket_price'] }}">
+
+        <div id="card-element">
+          <!-- A Stripe Element will be inserted here. -->
+        </div>
+        <button type="submit">Pay and Confirm Booking</button>
+        <div id="payment-status"></div>
+      </form>
+
+    {% else %}
+      <p><strong>Error: No Flight Information found.</strong></p>
+    {% endif %}
+  </main>
+
+  <script>
+    // Initialize Stripe.js
+    const stripe = Stripe('pk_test_51Q9vLoAgHUTa7waO7Er48utVSG3aMcmqFWMVLlZlkt8hUE8hJi2OnCDavnNDaY4DoXF2oULZ2CTbeVAYcGoB0keX006GrgZH19');
+    const elements = stripe.elements();
+    const cardElement = elements.create('card');
+    cardElement.mount('#card-element');
+
+    // Handle form submission
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      console.log('First Name:', document.getElementById('firstName').value);
+      console.log('Last Name:', document.getElementById('lastName').value);
+      console.log('Email:', document.getElementById('email').value);
+
+      const { paymentMethod, error } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+      });
+
+      if (error) {
+        document.getElementById('payment-status').innerText = error.message;
+        return;
+      }
+
+      // Making sure to use the correct parameters
+      const response = await fetch('/process_payment', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+              payment_method_id: paymentMethod.id,
+              amount: document.getElementById('price').value * 100,  // Example amount in cents
+              flight_id: document.getElementById('flight-id').value,
+              firstName: document.getElementById('firstName').value,  // Ensure these match the IDs
+              lastName: document.getElementById('lastName').value,
+              email: document.getElementById('email').value,
+          }),
+      });
+
+      const result = await response.json();
+      if (result.error) {
+        document.getElementById('payment-status').innerText = result.error;
+      } else {
+        document.getElementById('payment-status').innerText = "Payment Successful!";
+        // Optionally, redirect or show success message
+      }
+    });
+  </script>
+</body>
+</html>
+

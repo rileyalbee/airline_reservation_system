@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Airline Reservation System</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+        {% if not employee %}
+        <meta http-equiv="refresh" content="10; URL='{{ url_for('index') }}'" />
+        {% endif %}
+        <style>
+            <link rel="icon" type="static/x-icon" href="/static/favicon.png">
+            tr:hover { cursor: pointer; background-color: #f1f1f1; }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Welcome to Airline Reservation System</h1>
+            <h2>Modify Flights</h2>
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('search_flights') }}">Search Flights</a>
+            <a href="{{ url_for('flight_information') }}">Flight Information</a>
+            <a href="{{ url_for('account') }}">Account</a>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('logout') }}">Sign Out</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            {% endif%}
+        </nav>
+        </header>
+        <main>
+            {% if employee %}
+                <h2><strong>Employees Tools</strong></h2>
+                <a href="{{ url_for('account') }}">My Reservations</a>
+                <a href="{{ url_for('search_employee') }}">Search Employee</a>
+                <a href="{{ url_for('create_flight') }}">Create New Flights</a>
+                <a class="account_here">Modify Existing Flights</a>
+                <br><br><hr>
+                <h2>Hey {{ name }}! What do you want to do?</h2>
+                <summary>Modify existing flight status</summary>
+                    <form id="modify_flight" action="{{ url_for('mod_flight') }}" method="POST">
+                        <label for="flight_id">Flight ID:</label>
+                        <input type="text" id="flight_id" name="flight_id" required>
+
+                        <label for="mod_origin">Origin:</label>
+                        <input type="text" id="mod_origin" name="mod_origin">
+
+                        <label for="mod_destination">Destination:</label>
+                        <input type="text" id="mod_destination" name="mod_destination">
+
+                        <label for="mod_date">Date:</label>
+                        <input type="date" id="mod_date" name="mod_date">
+
+                        <label for="mod_seats_available">Change Flight Capacity:</label>
+                        <input type="text" id="mod_seats_available" name="mod_seats_available">
+
+                        <label for="mod_ticket_price">Ticket Price:</label>
+                        <input type="text" id="mod_ticket_price" name="mod_ticket_price">
+
+                        <label for="mod_flight_status">Change Flight Status:</label>
+                        <select name="mod_flight_status" id="mod_flight_status">
+                            <option value="Scheduled">Scheduled</option>
+                            <option value="On Time">On Time</option>
+                            <option value="Delayed">Delayed</option>
+                            <option value="Canceled">Canceled</option>
+                        </select>
+
+                        <button type="submit">Confirm Flight Modifications</button>
+                    </form>
+            {% else %}
+                <h2>You're not supposed to be here, lets take you home!</h2>
+            {% endif %}
+        </main>
+    </body>
+</html>

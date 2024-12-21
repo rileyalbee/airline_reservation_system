@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {% if success %}
+        <meta http-equiv="refresh" content="10; URL='{{ url_for('account') }}'" />
+        {% endif %}
+        <title>Airline Reservation System</title>
+        <link rel="icon" type="static/x-icon" href="/static/favicon.png">
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+    </head>
+    <body>
+        <header>
+            <h1>Welcome to Airline Reservation System</h1>
+            <h2>Register</h2>
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('search_flights') }}">Search Flights</a>
+            <a href="{{ url_for('flight_information') }}">Flight Information</a>
+            <a href="{{ url_for('account') }}">Account</a>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('logout') }}">Sign Out</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            {% endif%}
+        </nav>
+        </header>
+        <main>
+            <h2>Your next adventure starts here!</h2>
+            <p>Please enter the following information to create your account!</p>
+            {% if success %}
+            <p>Account created. Please wait while we redirect you!</p>
+            {% endif %}
+            {% if failed %}
+            <p>Oh no! Your email already exists, in our system!</p>
+            {% endif %}
+            <form action="{{ url_for('register') }}" method="POST">
+                <label for="email">Email:</label>
+                <input type="text" id="email" name="email" placeholder="buffy.summers@gmail.com" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Password" required>
+
+                <label for="first_name">First Name:</label>
+                <input type="text" id="first_name" name="first_name" placeholder="Buffy" required>
+
+                <label for="last_name">Last Name:</label>
+                <input type="text" id="last_name" name="last_name" placeholder="Summers" required>
+
+                <br>
+                <br>
+                <button type="submit">Create Account</button>
+            </form>
+
+        </main>
+    </body>
+</html>

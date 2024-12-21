@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Details</title>
+    <link rel="icon" type="static/x-icon" href="/static/favicon.png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Welcome to Airline Reservation System</h1>
+        <h2>Flight Information</h2>
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('search_flights') }}">Search Flights</a>
+            <a class="nav_here">Flight Information</a>
+            <a href="{{ url_for('account') }}">Account</a>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('logout') }}">Sign Out</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            {% endif%}
+        </nav>
+    </header>
+    <main>
+        {% if flight %}
+            <h2>Flight ID: {{ flight.flight_id }}</h2>
+            <p><strong>Origin:</strong> {{ flight.origin }}</p>
+            <p><strong>Destination:</strong> {{ flight.destination }}</p>
+            <p><strong>Date:</strong> {{ flight.date }}</p>
+            <p><strong>Seats Available:</strong> {{ flight.seats_available }}</p>
+            <p><strong>Ticket Price:</strong> {{ flight.ticket_price }}</p>
+            <p><strong>Flight Status:</strong> {{ flight.status }}</p><!-- hard coded for now -->
+            <a href="{{ url_for('book_flight', flight_id=flight['flight_id']) }}">Book it!</a><br><br>
+            {% if employee %}
+                <a href="{{ url_for('book_flight_for_customer', flight_id=flight['flight_id']) }}">Book it for a Customer!</a><br><br>
+            {% endif %}
+            <a href="{{ url_for('flight_information') }}">Search a diffrent flight ID!</a>
+            <!-- Add additional details here as needed -->
+        {% else %}
+            <form action="{{ url_for('flight_information') }}" method="POST"> <!-- Specify the action route -->
+                <label for="flight_id">Flight ID:</label>
+                <input type="text" id="flight_id" name="flight_id" placeholder="Enter Flight ID">
+
+                <button type="submit">Search Flight</button>
+            </form>
+        {% endif %}
+        {% if searchError %}
+            <p><strong>No Flight Found</strong></p>
+        {% endif %}
+    </main>
+</body>
+</html>

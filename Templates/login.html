@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {% if success %}
+        <meta http-equiv="refresh" content="5; URL='{{ url_for('account') }}'" />
+        {% endif %}
+        <title>Airline Reservation System</title>
+        <link rel="icon" type="static/x-icon" href="/static/favicon.png">
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+    </head>
+    <body>
+        <header>
+            <h1>Welcome to Airline Reservation System</h1>
+            <h2>Login</h2>
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('search_flights') }}">Search Flights</a>
+            <a href="{{ url_for('flight_information') }}">Flight Information</a>
+            <a href="{{ url_for('account') }}">Account</a>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('logout') }}">Sign Out</a>
+            {% else %}
+            <a class="nav_here">Login</a>
+            {% endif%}
+        </nav>
+        </header>
+        <main>
+            {% if success %}
+            <h2>Your next adventure starts now!</h2>
+            <p>Login Successful! Please wait while we redirect you!</p>
+            {% endif %}
+            {% if not_logged_in %}
+            <h2>Your next adventure starts here!</h2>
+            <p>Please enter your username and password to login!</p>
+            <form action="{{ url_for('login') }}" method="POST">
+                <label for="email">Email:</label>
+                <input type="text" id="email" name="email" placeholder="buffy.summers@gmail.com" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Password" required>
+
+                <button type="submit">Login</button>
+            </form>
+            <p>Don't have an account? <strong><a href="{{ url_for('register') }}">Regester here!</a></strong></p>
+            {% endif %}
+            {% if failed %}
+            <p>Login Failed</p>
+            {% endif %}
+        </main>
+    </body>
+</html>

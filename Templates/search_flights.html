@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Airline Reservation System</title>
+        <link rel="icon" type="static/x-icon" href="/static/favicon.png">
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+        <style>
+            tr:hover { cursor: pointer; background-color: #f1f1f1; }
+        </style>
+        <script>
+             function makeRowsClickable() {
+               const rows = document.querySelectorAll("tbody tr");
+               rows.forEach(row => {
+                        row.addEventListener("click", () => {
+                        const flightId = row.cells[0].textContent.trim(); // Get the flight ID from the first cell
+                        const baseUrl = "{{ url_for('flight_status', flight_id=0) }}"; // Base URL with placeholder flight_id
+                        const flightUrl = baseUrl.replace('/0', `/${flightId}`); // Replace 0 with the actual flightId
+                        window.location.href = flightUrl; // Redirect to the flight status page with the correct flightId
+                   });
+               });
+             }
+             window.onload = makeRowsClickable;
+        </script>
+    </head>
+    <body>
+        <header>
+            <h1>Welcome to Airline Reservation System</h1>
+            <h2>Search Flights</h2>
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a>
+            <a class="nav_here">Search Flights</a>
+            <a href="{{ url_for('flight_information') }}">Flight Information</a>
+            <a href="{{ url_for('account') }}">Account</a>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('logout') }}">Sign Out</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            {% endif%}
+        </nav>
+        </header>
+        <main>
+            <h2>Your next adventure starts here!</h2>
+            <p>Browse available flights and book your tickets easily.</p>
+            <form action="{{ url_for('search_flights') }}" method="POST">
+                <label for="flight_id">Flight ID:</label>
+                <input type="text" id="flight_id" name="flight_id" placeholder="Enter Flight ID">
+
+                <label for="origin">Origin:</label>
+                <input type="text" id="origin" name="origin" placeholder="Enter Origin">
+
+                <label for="destination">Destination:</label>
+                <input type="text" id="destination" name="destination" placeholder="Enter Destination">
+
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date">
+
+                <label for="seats_available">Seats Available:</label>
+                <input type="number" id="seats_available" name="seats_available" placeholder="Enter number of seats" min="1">
+
+                <button type="submit">Search Flights</button>
+            </form>
+            {% if flights %}
+                <h2>Available Flights</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Flight ID</th>
+                            <th>Origin</th>
+                            <th>Destination</th>
+                            <th>Date</th>
+                            <th>Seats Available</th>
+                            <th>Ticket Price</th>
+                            <th>Flight Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for flight in flights %}
+                        <tr>
+                            <td>{{ flight.flight_id }}</td>
+                            <td>{{ flight.origin }}</td>
+                            <td>{{ flight.destination }}</td>
+                            <td>{{ flight.date }}</td>
+                            <td>{{ flight.seats_available }}</td>
+                            <td>{{ flight.ticket_price }}</td>
+                            <td>{{ flight.status }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+            {% if searchError %}
+                <p>No flights available based on your search criteria.</p>
+            {% endif %}
+        </main>
+    </body>
+</html>
